@@ -57,7 +57,7 @@ def overwrite(data):
 # считывание информации из файла
 def read_data():
     with open('journal_list.csv', 'r', encoding='utf-8') as input_file:
-        data = list(map(lambda item: item.split(';'), input_file.readlines()))
+        data = list(map(lambda item: item.rstrip().split(';'), input_file.readlines()))
 
 
 # поиск информации в файле по ключу "key" с последующей записью в переменную "result_data"
