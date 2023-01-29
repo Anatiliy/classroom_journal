@@ -1,3 +1,4 @@
+import os
 from new_data_structure import NewDataStructure as nds
 
 class DataProcessing:
@@ -56,8 +57,12 @@ def overwrite(data):
 
 # считывание информации из файла
 def read_data():
-    with open('journal_list.csv', 'r', encoding='utf-8') as input_file:
-        data = list(map(lambda item: item.rstrip().split(';'), input_file.readlines()))
+    if os.path.exists('journal_list.csv'):
+        with open('journal_list.csv', 'r', encoding='utf-8') as input_file:
+            data = list(map(lambda item: item.rstrip().split(';'), input_file.readlines()))
+        return data
+    else:
+        return []
 
 
 # поиск информации в файле по ключу "key" с последующей записью в переменную "result_data"
