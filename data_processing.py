@@ -50,9 +50,14 @@ class DataProcessing:
         
 
 # перезапись файла информацией из переменной "data"
-#def overwrite(data):
-    #with open('telephone_directory.csv', 'w', encoding='utf-8') as output_file:
-        #output_file.writelines(list(map(lambda item: ';'.join(item) + '\n', data)))
+def overwrite(data):
+    with open('journal_list.csv', 'w', encoding='utf-8') as output_file:
+        output_file.writelines(list(map(lambda item: ';'.join(item) + '\n', data)))
+
+# считывание информации из файла
+def read_data():
+    with open('journal_list.csv', 'r', encoding='utf-8') as input_file:
+        data = list(map(lambda item: item.split(';'), input_file.readlines()))
 
 
 # поиск информации в файле по ключу "key" с последующей записью в переменную "result_data"
