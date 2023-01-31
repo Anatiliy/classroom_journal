@@ -15,11 +15,11 @@ class DataProcessing:
     def giveName(self, name: str):
         self.name = name
 
-    def newEntry(self, student, subject):
+    def newEntry(self, student: str, subject: str):
         self.data.append(nds(student, subject))
         #self.data[-1] = nds(student, subject)
 
-    def putScore(self,index, data):
+    def putScore(self,index, data: str):
         self.data[index].score.append(data)
 
     #def toStr(self):
@@ -35,31 +35,38 @@ class DataProcessing:
 
     # запись информации в файл
     def save(self):
-        data = [self.name].extend(list(map(lambda item: item.conversToStr(), self.data)))
-        with open(self.path, 'w', encoding='utf-8') as output_file:
-            output_file.writelines(data)
+        if self.data:
+            data = [self.name].extend(list(map(lambda item: item.conversToStr(), self.data)))
+            with open(self.path, 'w', encoding='utf-8') as output_file:
+                output_file.writelines(data)
+
+        else:
+            with open(self.path, 'w', encoding='utf-8') as output_file:
+                output_file.write('')
 
 
     # считывание всей информации из файла
     def upload(self):
         with open(self.path, 'r', encoding='utf-8') as input_file:
             data = input_file.readlines()
-        self.name = data.pop(0)
-        for item in data:
-            self.data.append(nds())
-            self.data[-1].conversToNDS(item)
-        
+        if data:
+            for item in data:
+                self.data.append(nds())
+                self.data[-1].conversToNDS(item)
+                
 
 # перезапись файла информацией из переменной "data"
 def overwrite(data):
-    with open('journal_list.csv', 'w', encoding='utf-8') as output_file:
-        output_file.writelines(list(map(lambda item: ';'.join(item) + '\n', data)))
+    if data:
+        with open('journal_list.csv', 'w', encoding='utf-8') as output_file:
+            print(*data, sep='\n', file=output_file)
+            #output_file.writelines(list(map(lambda item: ';'.join(item) + '\n', data)))
 
 # считывание информации из файла
 def read_data():
     if os.path.exists('journal_list.csv'):
         with open('journal_list.csv', 'r', encoding='utf-8') as input_file:
-            data = list(map(lambda item: item.rstrip().split(';'), input_file.readlines()))
+            data = list(map(lambda item: item.rstrip(), input_file.readlines()))
         return data
     else:
         return []
