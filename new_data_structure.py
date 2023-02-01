@@ -24,5 +24,8 @@ class NewDataStructure:
         data[0] = data[0].split(',')
         self.student = data[0][0]
         self.subject = data[0][1]
-        self.score = data[1].strip('[]').split(',')
+        if data[1] == '[]':
+            self.score = []
+        else:
+            self.score = data[1].strip('[]').split(',')
 
