@@ -1,4 +1,4 @@
-import controller as ct
+from controller import Controller as ct
 
 ct.main()
 
