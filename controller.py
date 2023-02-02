@@ -3,79 +3,74 @@ from view import View as vw
 import data_processing as pdata
 
 
-def main(journal_list=pdata.read_data()):
+class Controller:
     
-    value = vw.viewMenu(journal_list).lower()
+    journal_list = pdata.read_data()
 
-    if value in journal_list:
-        use_journal(value)
-
-    elif value == '0':
-        pdata.overwrite(journal_list)
-        print('До свидания!')
-
-    else:
-        create_journal(value, journal_list)
-        
-
+    # метод, осуществляющий работу главного меню
+    def main():
+        value = vw.viewMenu(Controller.journal_list).lower()
+        if value in Controller.journal_list:
+            Controller.use_journal(value)
+        elif value == '0':
+            pdata.overwrite(Controller.journal_list)
+            vw.viewMassage('До свидания!')
+        else:
+            Controller.create_journal(value)
        
-
-def use_journal(name, journal_list):
-    path = name + '_журнал.txt'
-    class_journal = dp(path, name)
-    class_journal.upload()
-    value = vw.journalMenu(name).split('-')
-
-    if value[0] == '1':
-        vw.view_student(value[1].lower(), class_journal.data)
-        use_journal(name, journal_list)
-
-    elif value[0] == '2':
-        use_subject(value[1], journal_list)
-                
-    
-    else:
-        main(journal_list)
-
-
-def create_journal(name, journal_list):
-    value = vw.newJournalMenu(name)
-    if value == '1':
-        journal_list.append(name)
-        path = name + '_журнал.txt'
+    # метод, осуществляющий рабору с журналом
+    def use_journal(name):
+        path = name + '_journal.txt'
         class_journal = dp(path, name)
-        class_journal.save()
-        print(f'журнал "{name.upper()}" создан')
-        main()
-    else:
-        main(journal_list)
-    
+        class_journal.upload()
+        value = vw.journalMenu(name).split('-')
+        match value:
+            case student, '1':
+                vw.view_student(student.lower(), class_journal.data)
+                Controller.use_journal(name)
+            case subject, '2':
+                Controller.use_subject(subject, class_journal)
+            case _:
+                Controller.main()
 
+    # метод, создающий новый журнал
+    def create_journal(name):
+        value = vw.newJournalMenu(name)
+        if value == '1':
+            Controller.journal_list.append(name)
+            path = name + '_journal.txt'
+            class_journal = dp(path, name)
+            class_journal.save()
+            vw.viewMassage(f'журнал "{name.upper()}" создан')
+            Controller.main()
+        else:
+            Controller.main()
 
-def use_subject(name, class_journal):
-    val = vw.view_subject(name.lower(), class_journal.data).split('-')
-    match val:
-        case str(val):
-            class_journal.newEntry(val, name.lower())
-
-        case str(val), '0':
-            for item in class_journal.data:
-                if item.subject == name and item.student == val:
-                    class_journal.data.pop(class_journal.index(item))
+    # метод, осуществляющий работу с предметом
+    def use_subject(name, class_journal):
+        val = vw.view_subject(name.lower(), class_journal.data).split('-')
+        match val:
+            case str(stud), '9':
+                class_journal.newEntry(stud, name.lower())
+                Controller.use_subject(name, class_journal)
+            case str(stud), '0':
+                for item in class_journal.data:
+                    if item.subject == name and item.student == stud:
+                        class_journal.data.pop(class_journal.data.index(item))
+                        break
                 else:
-                    print(f'Ученика с именем {val} нет в предмете {name}')
-                    use_subject(name, class_journal)
-
-        case str(val), '1'|'2'|'3'|'4'|'5' as score:
-            for item in class_journal.data:
-                if item.subject == name and item.student == val:
-                    class_journal.putScore(class_journal.data.index(item), score)
-                    print('Оценка выставлена.')
-                    use_subject(name, class_journal)
+                    vw.viewMassage(f'Ученика с именем {stud} нет в предмете {name}')
+                Controller.use_subject(name, class_journal)
+            case str(stud), '1'|'2'|'3'|'4'|'5' as score:
+                for item in class_journal.data:
+                    if item.subject == name and item.student == stud:
+                        class_journal.putScore(class_journal.data.index(item), score)
+                        vw.viewMassage('Оценка выставлена.')
+                        break
                 else:
-                    print(f'Ученика с именем {val} нет в предмете {name}')
-                    use_subject(name, class_journal)
-
-        case _:
-            create_journal(name, journal_list)
+                    vw.viewMassage(f'Ученика с именем {stud} нет в предмете {name}')
+                Controller.use_subject(name, class_journal)
+            case _:
+                class_journal.save()
+                Controller.use_journal(class_journal.name)
 
